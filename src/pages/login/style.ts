@@ -47,6 +47,7 @@ export const Submit = styled.button`
     background-color: ${props => props.theme.colors.background};
     color: ${props => props.theme.colors.navtext};
     border-radius: 5px;
+    border: 1px solid ${props => props.theme.colors.background};
     cursor: pointer;
     :hover{
         background-color: ${props => props.theme.colors.primary};
@@ -59,7 +60,7 @@ export const Span = styled.span`
     margin: 5px;
   pointer-events: none;
   position:absolute;
-  left:0;
+  left:25%;
   top:0;
   transition: 0.2s;
   transition-timing-function: ease;

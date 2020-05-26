@@ -11,11 +11,11 @@ const Home: React.FC = () => {
 
     useEffect(() => {
         const token =  localStorage.getItem('tokenMoney');
-        if(token == null) history.push('/login') 
-        getFolder()
+        if(token == null) {history.push('/login')}else{getFolder()} 
     }, [history, initialValue])
 
     const getFolder = async () => {
+        console.log('chamou')
         service.getFolders().then(data => {
             // setinitialValue(data)
             console.log(data)
