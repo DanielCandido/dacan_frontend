@@ -1,4 +1,5 @@
 export interface folder {
     name: string;
-    id: string;
+    userId: string;
+    _id: string;
 }

@@ -3,7 +3,7 @@ import { login } from '../interfaces/login'
 import { User } from '../interfaces/user';
 
 const configService = axios.create({
-    baseURL: process.env.REACT_APP_API_URL + '/api/',
+    baseURL: process.env.REACT_APP_API_URL?.concat('api/'),
     responseType: 'json',
     headers: {
         'Content-Type': 'application/json',

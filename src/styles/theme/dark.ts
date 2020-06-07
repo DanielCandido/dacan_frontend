@@ -2,9 +2,9 @@ export default {
     title: 'dark',
     colors: {
         primary: '#191927',
-        secundary: '#222230',
+        secundary: '#f5f5f5',
         navtext: '#fff',
         background: '#222230',
-        text: '#f5f5f5',
+        text: '#fff',
     }
 }

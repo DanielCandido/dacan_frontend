@@ -11,16 +11,21 @@ export const GridFolders = styled.div`
 `
 
 export const CardFolder = styled.div`
-    min-width: 25%;
+    min-width: 256px;
     width: 100%;
-    background-color: ${props => props.theme.colors.secundary};
-    height: 350px;
+    background-image: url('https://i.ibb.co/TW8GbS8/folder-icon.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 256px;
     text-align: center;
     padding: 15px;
     margin: 10px;
 `
 
 export const TitleCard = styled.h2`
-    color: ${props => props.theme.colors.text};
+    color: #333;
     font-size: 16pt;
 `

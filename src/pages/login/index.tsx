@@ -3,55 +3,49 @@ import { loginService } from '../../services'
 import { Formik, Form } from 'formik';
 import SnackBar from '../../components/snackbar';
 
-// Util
-import UserUtil from '../../utils/userUtil'
-
 import { useHistory } from 'react-router-dom';
-
-// interfaces
-// import { login } from '../../interfaces/login'
-import { User } from '../../interfaces/user'
-
-// Icones
-import { Facebook } from '@material-ui/icons'
 
 // Autenticacoes
 import FacebookLogin from 'react-facebook-login';
-
 import GoogleLogin from 'react-google-login';
 
+// Util
+import TokenUtil from '../../utils/usePersistedToken';
+
+// Estilo global
+import { FormGroup, Input, Label, Span, Submit } from '../../styles/style'
 
 // Estilos da pagina
-import { LoginForm, FormGroup, Input, Label, Span, Submit } from './style';
+import { LoginForm } from './style';
 import userUtil from '../../utils/userUtil';
 
 // Service api
 const service = new loginService()
-let user: User
 
 const Login: React.FC = () => {
     const [message, setMessage] = useState({ isOpen: false, message: "", time: 0 });
     const history = useHistory();
 
     useEffect(() => {
-        const token = localStorage.getItem('tokenMoney')
-        if (token != null) {
-            history.push('/')
-        }
+        console.log('chamou')
+        TokenUtil.getToken().then(token => {
+            console.log(token)
+            if (token != null) {
+                setTimeout(() => { history.push('/') }, 3100)
+            }
+        })
+
     })
 
     const responseFacebook = async (response: any) => {
         await userUtil.getName(response.name).then(name => {
-            // user.firstname = name.firstname
-            // user.lastname = name.lastname
-            // user.email = response.email
-            // user.password = response.userId
             const user = { firstname: name.firstname, lastname: name.lastname, email: response.email, password: response.userID }
             service.loginFacebook(user).then(data => {
                 console.log(data)
                 setMessage({ isOpen: true, message: data.message, time: 3000 })
-                localStorage.setItem('tokenMoney', data.token)
-                history.push('/')
+                TokenUtil.saveToken(data.token).then(token => {
+                    history.push('/')
+                })
             }).catch(e => {
                 console.log(e)
             })
@@ -62,12 +56,10 @@ const Login: React.FC = () => {
         console.log(response);
     }
 
-    const login = async (values: any) => {
+    const login = (values: any) => {
         service.login(values).then(data => {
-            console.log(data)
-            setMessage({ isOpen: true, message: data.message, time: 3000 })
             localStorage.setItem('tokenMoney', data.token)
-            history.push('/')
+            setMessage({ isOpen: true, message: data.message, time: 3000 })
         }).catch(e => {
             console.log(e)
             setMessage({ isOpen: true, message: e.message, time: 3000 })
@@ -86,10 +78,7 @@ const Login: React.FC = () => {
                     {({ values, handleChange, handleBlur }) => (
                         <Form>
                             <Label style={{ textAlign: 'center' }}>
-                                <img src="https://i.ibb.co/f2yhCfs/logo-note.png" style={{ maxWidth: '80px' }} alt="logo-note" />
-                            </Label>
-                            <Label style={{ textAlign: 'center' }}>
-                                <h3>Control Money</h3>
+                                <img src="https://i.ibb.co/2NkRfQF/logo.png" style={{ maxWidth: '160px' }} alt="logo-note" />
                             </Label>
                             <div style={{ textAlign: 'center' }}>
                                 <Label>
@@ -118,7 +107,6 @@ const Login: React.FC = () => {
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <Label style={{ display: 'flex', alignItems: "center" }}>
-                                    <Facebook style={{ backgroundColor: '#4c69ba', height: '39px', paddingLeft: '5px' }} />
                                     <FacebookLogin
                                         appId="830065177737971" //APP ID NOT CREATED YET
                                         fields="name,email,picture"

@@ -1,63 +1,93 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { folderService } from '../../services';
-import { Formik, Form, Field } from 'formik'
 import Carousel from 'react-grid-carousel'
+// Material
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
+import { Delete } from '@material-ui/icons'
 
-import { TitleCard } from './style';
+// Estilo da pagina
+import { TitleCard, CardFolder } from './style';
+
+// Interface
 import { folder } from '../../interfaces/folder';
+import SnackBar from '../snackbar';
 const service = new folderService()
 
-const Folders: React.FC = () => {
-    const [folders, setfolders] = useState([{ name: ''}])
-    const [initialState, setinitialState] = useState(0)
-    const [folderName, setfolderName] = useState<folder>({ name: '', id: '' })
+interface IProps {
+    config: Array<folder>;
+    updateValue(): void;
+}
 
-    const fetchFolder = async () => {
+const Folders: React.FC<IProps> = ({updateValue, config}) => {
+    const [folder, setfolder] = useState<folder>({ name: '', userId: '', _id: '' })
+    const [message, setmessage] = useState({ message: '', isOpen: false, time: 0 })
+    const [dialog, setdialog] = useState(false)
+    const folders = config 
 
-        service.getFolders().then(data => {
-            setfolders(data)
+    const handleClickOpen = (folder: folder) => {
+        setfolder(folder)
+        console.log(folder)
+        setdialog(true);
+    };
+
+    const handleClose = () => {
+        setdialog(false);
+    };
+
+    const deleteFolder = () => {
+        console.log(folder)
+        service.deleteFolder(folder).then(data => {
+            setdialog(false)
+            setmessage({ isOpen: true, time: 3000, message: data.message })
+            updateValue()
         }).catch(e => {
-            console.log(e)
+            setmessage({ isOpen: true, time: 3000, message: e.message })
         })
     }
-
-    const createFolder = async (folder: folder) => {
-        service.createFolder(folder).then(data => {
-            console.log(data)
-            setinitialState(initialState + 1)
-        }).catch(e => {
-            console.log(e)
-        })
-    }
-
-    useEffect(() => {
-        fetchFolder()
-    }, [initialState])
 
     return (
         <div>
             <Carousel cols={3} rows={1} gap={10} loop>
-                {folders.map((e, index) => (
-                    <Carousel.Item key={index}>
-                        <TitleCard>{e.name}</TitleCard>
-                    </Carousel.Item>
-                ))
+                {
+                    folders.map((e, index) => (
+                        <Carousel.Item key={index}>
+                            <CardFolder>
+                                <Delete onClick={() => handleClickOpen(e)} style={{
+                                    position: 'absolute', top: '20%',
+                                    backgroundColor: 'red', borderRadius: '50%', padding: '3px', fontSize: '20pt', cursor: 'pointer'
+                                }} />
+                                <a href={'/folder/' + e.name} style={{ textDecoration: 'none' }}>
+                                    <TitleCard>{e.name}</TitleCard>
+                                </a>
+                            </CardFolder>
+                        </Carousel.Item>
+                    ))
                 }
             </Carousel>
-            <Formik initialValues={folderName}
-                onSubmit={(folder, { resetForm }) => {
-                    createFolder(folder)
-                    resetForm({})
-                }}
+
+            {/* DIALOG PARA REMOVER PASTA */}
+            <Dialog
+                open={dialog}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
             >
-                {({ values, handleChange, handleBlur, handleReset }) => (
-                    <Form>
-                        <input type="text" value={values.name} placeholder="Nome da pasta" onChange={handleChange}
-                            onBlur={handleBlur} id="name" name="name" />
-                        <input type="submit" value="Cadastrar" />
-                    </Form>
-                )}
-            </Formik>
+                <DialogTitle id="alert-dialog-title">Deseja remover a pasta {folder.name} ?</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Todo conteúdo dentro da mesma sera deletado.
+          </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose} color="primary">
+                        Recusar
+          </Button>
+                    <Button onClick={deleteFolder} color="primary" autoFocus>
+                        Aceitar
+          </Button>
+                </DialogActions>
+            </Dialog>
+            <SnackBar config={message} />
         </div>
     )
 }

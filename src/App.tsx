@@ -11,6 +11,7 @@ import GlobalStyled from './styles/global';
 //Pages
 import Login from './pages/login';
 import Home from './pages/home';
+import FolderDetails from './pages/folder-details';
 
 function App() {
   const [theme, setTheme] = usePersistedState<DefaultTheme>('theme', light);
@@ -26,6 +27,7 @@ function App() {
         <Switch>
           <Route path='/' exact={true} component={Home} />
           <Route path='/login' component={Login} />
+          <Route path='/folder/:id' component={FolderDetails} />
         </Switch>
       </BrowserRouter>
     </ThemeProvider>
